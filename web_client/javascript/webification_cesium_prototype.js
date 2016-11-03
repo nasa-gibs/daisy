@@ -37,13 +37,13 @@ window.onload = function(){
     /* Modifies the loading of the tile */
     air_layer.requestImage = function(x, y, level){
         if(!jsonLoaded){
-            Cesium.loadJson("../data/TSurfAir.json").then(function(data){
+            Cesium.loadJson("data/TSurfAir.json").then(function(data){
                 for(i = 0; i < 1350; i++){
                     values.push(data.data[Math.floor(i / 30)][i % 30]);
                 }
                 translated_values = values;
             })
-            Cesium.loadJson("../data/time.json").then(function(data){
+            Cesium.loadJson("data/time.json").then(function(data){
               for(i = 0; i < 1350; i++){
                 time.push(data.data[Math.floor(i / 30)][i % 30]);
               }

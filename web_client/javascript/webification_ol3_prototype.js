@@ -36,7 +36,7 @@ function storePixels(tile, layer_name){
 }
 function webificationTranslator(layer_name){
     var xml = new XMLHttpRequest();
-    var file_name = "../data/" + layer_name + ".json";
+    var file_name = "data/" + layer_name + ".json";
     xml.overrideMimeType("application/json");
     xml.open("GET", file_name, true);
     // xml.open("GET", "http://airsl2.gesdisc.eosdis.nasa.gov/pomegranate/Aqua_AIRS_Level2/AIRS2RET.006/2002/244/AIRS.2002.09.01.140.L2.RetStd_IR.v6.0.7.0.G13207150837.hdf/TSurfAir%5B%5D?output=json", true);
@@ -1844,16 +1844,16 @@ function download(){
     var a = document.createElement('a');
     switch(document.getElementById("layer-download").selectedIndex){
         case 0:
-            a.download = "../data/TSurfAir.json";
+            a.download = "data/TSurfAir.json";
             break;
         case 1:
-            a.download = "../data/CO_total_column.json";
+            a.download = "data/CO_total_column.json";
             break;
         case 2:
-            a.download = "../data/totH2OStd.json";
+            a.download = "data/totH2OStd.json";
             break;
         case 3:
-            a.download = "../data/CldFrcTot.json";
+            a.download = "data/CldFrcTot.json";
             break;
     }
     a.click();
