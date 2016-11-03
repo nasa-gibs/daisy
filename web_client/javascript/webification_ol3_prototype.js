@@ -321,6 +321,7 @@ var world_bounds_layer = new ol.layer.Tile({
     source: world_bounds_source
 });
 
+// The webification layer
 var webification_layer = new ol.layer.Tile({
     source: webification_source
 })
@@ -392,7 +393,7 @@ var style = new ol.style.Style({
     })
 });
 
-
+//Custom layer for each data set
 map.addLayer(base_layer);
 map.addLayer(webification_layer);
 map.addLayer(air_layer);
@@ -402,6 +403,8 @@ map.addLayer(cloud_layer);
 map.addLayer(world_bounds_layer);
 map.addLayer(vector_layer);
 
+
+// Toggle whether or not the non-frontprint version is displayed
 function toggleAir(){
     if(!document.getElementById("air-layer").checked){
         webification_layer.setVisible(false);
@@ -415,6 +418,7 @@ function render(){
     map.render();
 }
 
+// Custom value sliders for each data set
 var slider_air = new Slider('#slider-air', {
 });
 
@@ -1152,6 +1156,10 @@ function findDrawTilePixel(tilegrid, tile_coord){
 }
 
 var changed = false;
+
+// Draws webification tiles using min, max, and time as a filter. Main difference
+// between this and other tile draws is that its get value refers back to the json
+// that stored those values.
 function drawWebificationTiles(data_name, canvas, tiles, tilegrid, size, color_scale, min, max, opacity, filter, timeMin, timeMax){
     var context = canvas.getContext('2d');
     var no_data_value = tiles[0]["no_data_value"];
@@ -1297,6 +1305,10 @@ function drawTiles(canvas, tiles, tilegrid, size, color_scale, min, max, opacity
     }
 }
 
+/*
+ * Each of the following layers calculates what tiles are currently visible and then
+ * changes the tiles that are currently shown to look like what they are supposed to be.
+ */
 webification_layer.on('postcompose', function(evt){
     getSlider();
     if(layer_array["webification"] != null && !document.getElementById("web-checkbox").checked){
@@ -1609,6 +1621,7 @@ var csv_data = [];
 /* Finds the aggregate statistics within the box */
 function calculateBox(tilegrid, tile_size, tile_array, box_extent){
     var layer_name;
+    // Start by figuring out which layer was selected
     switch(document.getElementById("layer-picker").selectedIndex){
         case 0:
             layer_name = "TSurfAir";
@@ -1721,6 +1734,7 @@ var dataX = [];
 var dataY = [];
 var data_exists = false;
 
+// Draws a box and stores and finds all necessary data
 dragBox.on('boxend', function(){
     vector_source.clear();
     chart_data.length = 0;
@@ -1744,6 +1758,7 @@ dragBox.on('boxend', function(){
     [dataX, dataY] = sortData(chart_data);
 })
 
+// Sorts data into values and their number of occurences
 function sortData(values){
     var unique_values = [], value_counts = [], prev;
 
@@ -1761,6 +1776,7 @@ function sortData(values){
     return [unique_values, value_counts];
 }
 
+// Creates a chart in a separate window
 function createChart(){
     if(data_exists){
         switch(current_layer){
@@ -1796,6 +1812,7 @@ function createChart(){
     }
 }
 
+// Creates a downloadable CSV file
 function createCSV(){
     var csvContent = "data:text/csv;charset=utf-8,";
     var lineArray = [];
@@ -1838,8 +1855,7 @@ function createCSV(){
     a.click();
 }
 
-
-
+// Downloads the full data set
 function download(){
     var a = document.createElement('a');
     switch(document.getElementById("layer-download").selectedIndex){
@@ -1859,7 +1875,7 @@ function download(){
     a.click();
 }
 
-
+// This code finds the mouse and then displays values of points on click
 var mousePosition = null;
 var container = document.getElementById('map');
 
