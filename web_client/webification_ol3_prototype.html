@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.17.1/css/ol.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/7.1.0/css/bootstrap-slider.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/7.1.0/css/bootstrap-slider.min.css" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.17.1/ol.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/7.1.0/bootstrap-slider.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/7.1.0/bootstrap-slider.min.js"></script>
+    <script type="text/javascript" src="http://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <script src="https://rawgit.com/Esri/lerc/master/js/LercCodec.js"></script>
+    <title>Webification OL3 Prototype</title>
+    <style type="text/css">
+    body { overflow: hidden; }
+
+    .navbar-offset { margin-top: 50px; }
+    #map { position: absolute; top: 50px; bottom: 0px; left: 0px; right: 0px; }
+    #map .ol-zoom { font-size: 1.2em; }
+
+    .zoom-top-opened-sidebar { margin-top: 5px; }
+    .zoom-top-collapsed { margin-top: 45px; }
+
+    .mini-submenu{
+        display:none;
+        background-color: rgba(255, 255, 255, 0.46);
+        border: 1px solid rgba(0, 0, 0, 0.9);
+        border-radius: 4px;
+        padding: 9px;
+        /*position: relative;*/
+        width: 42px;
+        text-align: center;
+    }
+
+    .mini-submenu-left {
+        position: absolute;
+        top: 60px;
+        left: .5em;
+        z-index: 40;
+    }
+
+    #map { z-index: 35; }
+
+    .sidebar { z-index: 45; }
+
+    .main-row { position: relative; top: 0; }
+
+    .mini-submenu:hover{
+        cursor: pointer;
+    }
+
+    .slide-submenu{
+        background: rgba(0, 0, 0, 0.45);
+        display: inline-block;
+        padding: 0 8px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    </style>
+
+    <script type="text/javascript">
+
+    function applyMargins() {
+        var leftToggler = $(".mini-submenu-left");
+        if (leftToggler.is(":visible")) {
+            $("#map .ol-zoom")
+            .css("margin-left", 0)
+            .removeClass("zoom-top-opened-sidebar")
+            .addClass("zoom-top-collapsed");
+        } else {
+            $("#map .ol-zoom")
+            .css("margin-left", $(".sidebar-left").width())
+            .removeClass("zoom-top-opened-sidebar")
+            .removeClass("zoom-top-collapsed");
+        }
+    }
+
+    function isConstrained() {
+        return $(".sidebar").width() == $(window).width();
+    }
+
+    function applyInitialUIState() {
+        if (isConstrained()) {
+            $(".sidebar-left .sidebar-body").fadeOut('slide');
+            $('.mini-submenu-left').fadeIn();
+        }
+    }
+
+    $(function(){
+        $('.sidebar-left .slide-submenu').on('click',function() {
+            var thisEl = $(this);
+            thisEl.closest('.sidebar-body').fadeOut('slide',function(){
+                $('.mini-submenu-left').fadeIn();
+                applyMargins();
+            });
+        });
+
+        $('.mini-submenu-left').on('click',function() {
+            var thisEl = $(this);
+            $('.sidebar-left .sidebar-body').toggle('slide');
+            thisEl.hide();
+            applyMargins();
+        });
+
+        $(window).on("resize", applyMargins);
+
+        var map = new ol.Map({
+            target: "map",
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                })
+            ],
+            view: new ol.View({
+                center: [0, 0],
+                zoom: 2
+            })
+        });
+        applyInitialUIState();
+        applyMargins();
+    });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar navbar-fixed-top navbar-default" role="navigation">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">Webification Openlayers Prototype</a>
+                </div>
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
+    </div>
+</nav>
+<div class="navbar-offset"></div>
+<div id="map">
+    <!-- <canvas id="map_canvas" z-index="2"></canvas> -->
+</div>
+<div class = "row main-row">
+    <br>
+</div>
+<div class="row main-row">
+    <div class="col-sm-4 col-md-3 sidebar sidebar-left pull-left">
+        <div class="panel-group sidebar-body" id="accordion-left">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" href="#layers">
+                            <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span>
+                            Data Set Picker
+                        </a>
+                    </h4>
+                </div>
+                <div id="layers" class="panel-collapse collapse">
+
+                    <div class="panel-body list-group">
+                        <b>Layers:</b><br>
+                        <form id="data-picker">
+                            <input type="radio" name="layer" value="TSurfAir" checked="true"> Air Temperature</input><br>
+                            <input type="radio" name="layer" value="CO_total_column"> Total Column Carbon Monoxide </input><br>
+                            <input type="radio" name="layer" value="totH2OStd"> Total Precipitable Water Vapor</input><br>
+                            <input type="radio" name="layer" value="CldFrcTot"> Total Cloud Fraction</input><br>
+                        </form>
+                        <div id="slider-air-div">
+                            <input id="slider-air" type="text" class="span2" data-slider-step=".1" data-slider-min="280" data-slider-max="320" onchange="render()" data-slider-value="[280, 320]"/>
+                        </div>
+                        <div id="slider-carbon-div" style="display:none">
+                            <input id="slider-carbon" type="text" class="span2" data-slider-step="1000000" data-slider-min="1174079681738047500" data-slider-max="2443079377668276000" onchange="render()" data-slider-value="[1174079681738047500, 2443079377668276000]"/>
+                        </div>
+                        <div id="slider-vapor-div" style="display:none">
+                            <input id="slider-vapor" type="text" class="span2" data-slider-step=".1" data-slider-min="0" data-slider-max="60" onchange="render()" data-slider-value="[0, 60]"/>
+                        </div>
+                        <div id="slider-cloud-div" style="display:none">
+                            <input id="slider-cloud" type="text" class="span2" data-slider-step=".001" data-slider-min="0" data-slider-max="1" onchange="render()" data-slider-value="[0, 1]"/>
+                        </div>
+                            <br>
+
+                        <input type="checkbox" id="filter-values-air" checked="false" onchange="changeSliderAirColor()">Filter Values</input><br>
+                        Adjust transparency of data layer<br>
+                        <input id="slider-transparency-air" data-slider-id="transparency" type="text" class="span2" value="" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="100"/><br>
+                        <b>Color Options:</b>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<select id="color-options-air" class = "form-control" onchange="changeSliderAirColor()">
+                            &nbsp;&nbsp;&nbsp;&nbsp;<option>Grayscale/Scalar</option>
+                            <option>Grayscale/Logarithmic</option>
+                            <option>Jet/Scalar</option>
+                            <option>Jet/Logarithmic</option>
+                            <option>Panoply-diff/Scalar</option>
+                            <option>Panoply-diff/Logarithmic</option>
+                            <option>Parula/Scalar</option>
+                            <option>Parula/Logarithmic</option>
+                            <option>Red-Blue/Scalar</option>
+                            <option>Red-Blue/Logarithmic</option>
+                            <option selected="selected">Cube-Helix/Scalar</option>
+                            <option>Cube-Helix/Logarithmic</option>
+                        </select>
+                        <br><br>
+                        <input type="checkbox" id="web-checkbox"> Interpolated Data</input>
+                        <br>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" href="#properties">
+                        <span class="glyphicon glyphicon-info-sign"></span>
+                        Coordinate Values
+                    </a>
+                </h4>
+            </div>
+            <div id="properties" class="panel-collapse collapse">
+                <div id="info-box">
+                    &nbsp;&nbsp;&nbsp;&nbsp; <table class="table-bordered"><th><b>Layer</b></th><th><b>Value</b></th></table>
+                </div>
+                <!-- <div id="info">&nbsp;&nbsp;&nbsp;&nbsp;<b>Info: </b></div> -->
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" href="#taskpane">
+                        <span class="glyphicon glyphicon-stats"></span>
+                        Statistics
+                    </a>
+                </h4>
+            </div>
+            <div id="taskpane" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <p>Press ctrl/cmd and drag to create a box to find statistics within
+                        the area. Must redraw box for new values to appear.</p>
+                        <select id="layer-picker" class = "form-control">
+                            &nbsp;&nbsp;&nbsp;&nbsp;<option>Surface Air Temperature</option>
+                            <option>Total Column Carbon Monoxide</option>
+                            <option>Total Precipitable Water Vapor</option>
+                            <option>Cloud Fraction Total</option>
+                        </select>
+                        <br>
+                        <p id="min-val"><b>Min Value:</b> </p>
+                        <p id="min-coord"><b>Min Coordinates:</b> </p>
+                        <p id="max-val"><b>Max:</b> </p>
+                        <p id="max-coord"><b>Min Coordinates:</b> </p>
+                        <p id="average-val"><b>Average:</b> </p>
+                        <button id="generate-chart" onclick="createChart()" type="button" class="btn btn-primary">Create Chart</button>
+                        <button id="generate-csv" onclick="createCSV()" type="button" class="btn btn-primary">Download CSV</button>
+                        <br><br>
+                        <div id="chartContainer" width="100%" height:"200px"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" href="#download">
+                            <span class="glyphicon glyphicon-download-alt"></span>
+                            Download
+                        </a>
+                    </h4>
+                </div>
+                <div id="download" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <p>Download the layer data. <br>
+                            <select id="layer-download" class = "form-control">
+                                &nbsp;&nbsp;&nbsp;&nbsp;<option>Surface Air Temperature</option>
+                                <option>Total Column Carbon Monoxide</option>
+                                <option>Total Precipitable Water Vapor</option>
+                                <option>Cloud Fraction Total</option>
+                            </select>
+                            <b>Warning: May take a long time</b>
+                        </p>
+                        <button type="button" class="btn btn-primary" onclick="download()" type="button" class="btn btn-primary"><div id="download-btn" data-toggle="tooltip" data-placement="top">Download</div></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="javascript/color_scales.js"></script>
+    <script src="Cesium/Build/Cesium/Cesium.js"></script>
+    <script src="javascript/webification_ol3_prototype.js"></script>
+</body>
+</html>

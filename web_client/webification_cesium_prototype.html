@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Use correct character set. -->
+  <meta charset="utf-8">
+  <!-- Tell IE to use the latest, best version. -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <title>Webification Cesium Prototype</title>
+  <script src="javascript/Cesium/Build/Cesium/Cesium.js"></script>
+  <script src="javascript/webification_cesium_prototype.js"></script>
+  <script src="javascript/gibs.js"></script>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/7.1.0/css/bootstrap-slider.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/7.1.0/css/bootstrap-slider.min.css" />
+  <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/7.1.0/bootstrap-slider.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/7.1.0/bootstrap-slider.min.js"></script>
+  <script src="javascript/LercCodec.js"></script>
+  <script src="javascript/color_scales.js"></script>
+  <style>
+      @import url(javascript/Cesium/Build/Cesium/Widgets/widgets.css);
+      html, body, #cesiumContainer {
+          width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+      }
+  </style>
+</head>
+<body>
+    <div id="info-box">Info Box: </div>
+    <input id="slider-air" type="text" class="span2" onchange="render()" data-slider-step="1" data-slider-min="280" data-slider-max="325" data-slider-value="[0,100000]"/><br>
+    <input id="slider-time" type="text" class="span2" onchange="render()" data-slider-step="1" data-slider-min="0" data-slider-max="1350" data-slider-value="[0,1350]"/><br>
+    &nbsp;&nbsp;<b>Color Options:</b>
+    &nbsp;&nbsp;&nbsp;&nbsp;<select id="color-options-air" onchange="render()" class = "form-control">
+        &nbsp;&nbsp;&nbsp;&nbsp;<option>Grayscale/Scalar</option>
+        <option>Grayscale/Logarithmic</option>
+        <option>Jet/Scalar</option>
+        <option>Jet/Logarithmic</option>
+        <option>Panoply-diff/Scalar</option>
+        <option>Panoply-diff/Logarithmic</option>
+        <option>Parula/Scalar</option>
+        <option>Parula/Logarithmic</option>
+        <option>Red-Blue/Scalar</option>
+        <option>Red-Blue/Logarithmic</option>
+        <option selected="selected">Cube-Helix/Scalar</option>
+        <option>Cube-Helix/Logarithmic</option>
+    </select>
+    <div id="box-values">Min: <br>Min Coordinates: <br>Max: <br>Max Coordinates: <br>Average: <br></div>
+  <div id="cesium-container"></div>
+</body>
+</html>
