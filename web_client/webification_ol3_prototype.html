@@ -192,6 +192,11 @@
                         <div id="slider-cloud-div" style="display:none">
                             <input id="slider-cloud" type="text" class="span2" data-slider-step=".001" data-slider-min="0" data-slider-max="1" onchange="render()" data-slider-value="[0, 1]"/>
                         </div>
+                        <br>
+                        Time:
+                        <div id="slider-time-div">
+                            <input id="slider-time" type="text" class="span2" data-slider-step="1" data-slider-min="0" data-slider-max="1350" onchange="render()" data-slider-value="[0, 1350]"/>
+                        </div>
                             <br>
 
                         <input type="checkbox" id="filter-values-air" checked="false" onchange="changeSliderAirColor()">Filter Values</input><br>
@@ -293,7 +298,6 @@
         </div>
     </div>
     <script src="javascript/color_scales.js"></script>
-    <script src="Cesium/Build/Cesium/Cesium.js"></script>
     <script src="javascript/webification_ol3_prototype.js"></script>
 </body>
 </html>

@@ -34,7 +34,7 @@ function storePixels(tile, layer_name){
 }
 function webificationTranslator(layer_name){
     var xml = new XMLHttpRequest();
-    var file_name = layer_name + ".json";
+    var file_name = "../data/" + layer_name + ".json";
     xml.overrideMimeType("application/json");
     xml.open("GET", file_name, true);
     // xml.open("GET", "http://airsl2.gesdisc.eosdis.nasa.gov/pomegranate/Aqua_AIRS_Level2/AIRS2RET.006/2002/244/AIRS.2002.09.01.140.L2.RetStd_IR.v6.0.7.0.G13207150837.hdf/TSurfAir%5B%5D?output=json", true);
@@ -428,6 +428,8 @@ var slider_cloud = new Slider('#slider-cloud', {
 var slider_transparency_air = new Slider('#slider-transparency-air', {
 });
 
+var slider_time = new Slider('#slider-time', {
+});
 /*
 * This function changes the color under the slider on change of the dropdown.
 */
@@ -1148,7 +1150,7 @@ function findDrawTilePixel(tilegrid, tile_coord){
 }
 
 var changed = false;
-function drawWebificationTiles(data_name, canvas, tiles, tilegrid, size, color_scale, min, max, opacity, filter){
+function drawWebificationTiles(data_name, canvas, tiles, tilegrid, size, color_scale, min, max, opacity, filter, timeMin, timeMax){
     var context = canvas.getContext('2d');
     var no_data_value = tiles[0]["no_data_value"];
     for(i = 0; i < tiles.length; i++){
@@ -1160,10 +1162,11 @@ function drawWebificationTiles(data_name, canvas, tiles, tilegrid, size, color_s
         var original_image = context.getImageData(pixel[0], pixel[1], size, size);
         var change = false;
         for(j = 0; j < tile["values"].length; j++){
+            var index = tile["values"][j];
             var value = getValue(data_name, tile["values"][j], no_data_value);
             if(!filter){
                 if(value != null){
-                    if(value < min){
+                    if(value < min && index >= timeMin && index <= timeMax){
                         value = min;
                     }
                     if(value > max){
@@ -1184,7 +1187,7 @@ function drawWebificationTiles(data_name, canvas, tiles, tilegrid, size, color_s
                 }
             }
             else{
-                if(value != null && value > min && value < max){
+                if(value != null && value > min && value < max && index >= timeMin && index <= timeMax){
                     var colors = color(color_scale, value, min, max);
                     image.data[j * 4] = colors[0];
                     image.data[j * 4 + 1] = colors[1];
@@ -1312,7 +1315,11 @@ webification_layer.on('postcompose', function(evt){
             var filter = document.getElementById("filter-values-air").checked;
             var opacity = 255 * slider_transparency_air.getValue()/100;
             var data_name = getRadioVal();
-            drawWebificationTiles(data_name, canvas, visible_tiles, tilegrid, size, color_scale, range[0], range[1], opacity, filter);
+            drawWebificationTiles(data_name, canvas, visible_tiles, tilegrid,
+                                  size, color_scale, range[0], range[1],
+                                  opacity, filter,
+                                  slider_time.getValue()[0],
+                                  slider_time.getValue()[1]);
         }
     }
 })
@@ -1835,16 +1842,16 @@ function download(){
     var a = document.createElement('a');
     switch(document.getElementById("layer-download").selectedIndex){
         case 0:
-            a.download = "TSurfAir.json";
+            a.download = "../data/TSurfAir.json";
             break;
         case 1:
-            a.download = "CO_total_column.json";
+            a.download = "../data/CO_total_column.json";
             break;
         case 2:
-            a.download = "totH2OStd.json";
+            a.download = "../data/totH2OStd.json";
             break;
         case 3:
-            a.download = "CldFrcTot.json";
+            a.download = "../data/CldFrcTot.json";
             break;
     }
     a.click();
