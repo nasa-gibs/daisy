@@ -2,6 +2,8 @@ var viewer;
 var layer_data = [];
 var values = [];
 var time = [];
+//By default should be localhost
+var server_name = "skywalker.jpl.nasa.gov";
 window.onload = function(){
     var base_layer = new Cesium.WebMapTileServiceImageryProvider({
         url : '//gibs.earthdata.nasa.gov/wmts-geo/wmts.cgi?TIME=2013-06-16',
@@ -15,7 +17,7 @@ window.onload = function(){
     });
 
     var air_layer = new Cesium.WebMapTileServiceImageryProvider({
-        url: "http://skywalker.jpl.nasa.gov/wmts-geo/wmts.cgi?",
+        url: "http://" + server_name + "/wmts-geo/wmts.cgi?",
         layer: "airs_test",
         crossOrigin: "Anonymous",
         style: "default",
@@ -41,6 +43,11 @@ window.onload = function(){
                 }
                 translated_values = values;
             })
+            Cesium.loadJson("../data/time.json").then(function(data){
+              for(i = 0; i < 1350; i++){
+                time.push(data.data[Math.floor(i / 30)][i % 30]);
+              }
+            })
             jsonLoaded = true;
         }
         if(air_layer.ready){
@@ -50,7 +57,7 @@ window.onload = function(){
     }
     /* When loading a tile, it reads the values to determine the coloration */
     function loadTile(x, y, level, min, max, timeMin, timeMax){
-        var src = "http://skywalker.jpl.nasa.gov/wmts-geo/wmts.cgi?" +
+        var src = "http://" + server_name + "/wmts-geo/wmts.cgi?" +
         "&layer=airs_test&style=default&tilematrixset=EPSG4326_500m&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Flerc&TileMatrix=" +
         level + "&TileCol=" + x + "&TileRow=" + y;
         var image = new Image();
@@ -107,6 +114,7 @@ window.onload = function(){
                     reject(image);
                 }
             })
+            render();
         })
     }
 
@@ -119,8 +127,6 @@ window.onload = function(){
     });
 
     var scene = viewer.scene;
-    var handler;
-
     var scene = viewer.scene;
     var cartesian = new Cesium.Cartesian3();
  var scratchCartographic = new Cesium.Cartographic();
@@ -607,6 +613,7 @@ function render(){
     var layer = viewer.imageryLayers.get(2);
     hideLayer(layer);
     window.setTimeout(function(){layer.show = true;}, 10);
+    console.log("Render! ");
 }
 
 function hideLayer(layer){
@@ -616,3 +623,16 @@ function hideLayer(layer){
 function showLayer(layer){
     layer.show = true;
 }
+
+// function getTime(value){
+//     var secs_in_4_years = 126230400;
+//     var modulo = value % secs_in_4_years;
+//     var day;
+//     var month;
+//     var hour;
+//     var min;
+//
+//     switch(modulo){
+//
+//     }
+// }

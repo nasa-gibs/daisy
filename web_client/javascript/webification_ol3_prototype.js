@@ -10,6 +10,8 @@
 /* Stores all the pixel data for each layer */
 var layer_array = new Array();
 var translated_values = [];
+//Change to localhost once applicable
+var server_name = "skywalker.jpl.nasa.gov";
 /*
 * Given the name of the layer (will be the key) and the array of values of a
 * tile, it will store it in the layer_array. How to access an element of layer_array:
@@ -131,7 +133,7 @@ var base_source = new ol.source.WMTS({
 });
 
 var webification_source = new ol.source.WMTS({
-    url: "http://skywalker.jpl.nasa.gov/wmts-geo/wmts.cgi?",
+    url: "http://" + server_name + "/wmts-geo/wmts.cgi?",
     layer: "airs_test",
     style: "default",
     format: "image/lerc",
@@ -165,7 +167,7 @@ var webification_source = new ol.source.WMTS({
 });
 
 var air_source = new ol.source.WMTS({
-    url: "http://skywalker.jpl.nasa.gov/wmts-geo/wmts.cgi?",
+    url: "http://" + server_name + "/wmts-geo/wmts.cgi?",
     layer: "airs_TSurfAir",
     style: "default",
     format: "image/lerc",
@@ -199,7 +201,7 @@ var air_source = new ol.source.WMTS({
 });
 
 var CO_source = new ol.source.WMTS({
-    url: "http://skywalker.jpl.nasa.gov/wmts-geo/wmts.cgi?",
+    url: "http://"+ server_name + "/wmts-geo/wmts.cgi?",
     layer: "airs_CO_total_column",
     style: "default",
     format: "image/lerc",
@@ -233,7 +235,7 @@ var CO_source = new ol.source.WMTS({
 });
 
 var H2O_source = new ol.source.WMTS({
-    url: "http://skywalker.jpl.nasa.gov/wmts-geo/wmts.cgi?",
+    url: "http://" + server_name + "/wmts-geo/wmts.cgi?",
     layer: "airs_totH2OStd",
     style: "default",
     format: "image/lerc",
@@ -267,7 +269,7 @@ var H2O_source = new ol.source.WMTS({
 });
 
 var cloud_source = new ol.source.WMTS({
-    url: "http://skywalker.jpl.nasa.gov/wmts-geo/wmts.cgi?",
+    url: "http://" + server_name + "/wmts-geo/wmts.cgi?",
     layer: "airs_CldFrcTot",
     style: "default",
     format: "image/lerc",
