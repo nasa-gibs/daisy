@@ -1,0 +1,107 @@
+<html>
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" />
+    <title>Chart</title>
+    <script type="text/javascript">
+    var chart;
+
+    function render(){
+        createChart();
+    }
+
+    window.onload = createChart;
+
+    function createChart() {
+        var x_vals = localStorage.xValues;
+        var y_vals = localStorage.yValues;
+        var length = localStorage.dataLength;
+        var units = localStorage.units;
+        var title = localStorage.Title;
+        var xAxis = localStorage.xAxis;
+
+        var carbonDataPoints = [];
+        var x_point;
+        var y_point;
+
+        var last_x_comma = 0;
+        var x_comma;
+        var last_y_comma = 0;
+        var y_comma;
+        for(var i = 0; i < length - 1; i++){
+            x_comma = x_vals.indexOf(",", last_x_comma);
+            y_comma = y_vals.indexOf(",", last_y_comma);
+            x_point = parseInt(x_vals.substring(last_x_comma, x_comma));
+            y_point = parseInt(y_vals.substring(last_y_comma, y_comma));
+            last_x_comma = x_comma + 1;
+            last_y_comma = y_comma + 1;
+            carbonDataPoints.push({x: x_point, y: y_point});
+        }
+        var option = document.getElementById("chart-options").selectedIndex;
+        var optionName;
+        switch(option){
+            case 0:
+                optionName = "spline";
+                break;
+            case 1:
+                optionName = "line";
+                break;
+            case 2:
+                optionName = "bar";
+                break;
+            case 3:
+                optionName = "column";
+                break;
+            default:
+                optionName = "column";
+                break;
+        }
+        chart = new CanvasJS.Chart("chartContainer",
+        {
+            zoomEnabled: true,
+            title:{
+                text: title
+            },
+
+            axisY :{
+                title: "Occurences",
+                suffix: ""
+            },
+            animationEnabled: true,
+            axisX :{
+                title: xAxis,
+                suffix: units
+            },
+            data: [
+                {
+                    markerSize: 0,
+                    toolTipContent: "<span style='\"'color: {color};'\"'><strong>Amount</strong></span> {x}"+ units + "<br/><span style='\"'color: {color};'\"'><strong>Occurences</strong></span> {y} ",
+                    type: optionName,
+                    showInLegend: true,
+                    legendText: "Computed over the selected area",
+                    dataPoints: carbonDataPoints
+                }
+            ]
+        });
+        chart.render();
+    }
+    </script>
+    <script type="text/javascript" src="javascript/canvasjs.min.js"></script>
+</head>
+<body>
+<div class="row">
+    <div class="col-sm-4 col-md-3">
+    <div id="chartOptions">Chart Options:
+        <select id="chart-options" class = "form-control" onchange="render()">
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <option>Spline</option>
+            <option>Line</option>
+            <option>Bar</option>
+            <option selected="selected">Column</option>
+        </select>
+    </div>
+</div>
+</div>
+    <div id="chartContainer" style="height: 50%; width: 100%;"></div>
+</body>
+</html>

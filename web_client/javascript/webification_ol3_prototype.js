@@ -71,9 +71,7 @@ function tileLoader(image, src, layer_name) {
         if (this.readyState == 4 && this.status == 200) {
             var tile = [];
             img.decodedPixels = this.codec.decode(this.response, { returnMask: true });
-            tile["values"] = img.decodedPixels.pixelData;
             tile["coord"] = image.getTileCoord();
-            tile["no_data_value"] = img.decodedPixels.noDataValue;
             if(layer_name == "webification"){
                 webificationTranslator("TSurfAir");
                 webificationTranslator("totH2OStd");
@@ -1157,23 +1155,33 @@ function findDrawTilePixel(tilegrid, tile_coord){
 
 var changed = false;
 
+function getImgData(mapLayer, tileCoord){
+  var imgData = mapLayer.getSource().a.get(tileCoord.join('/')).g;
+  return imgData.decodedPixels.pixelData;
+}
+
+function getNoDataValue(mapLayer, tileCoord){
+  var noDataValue = mapLayer.getSource().a.get(tileCoord.join('/')).g;
+  return noDataValue.decodedPixels.noDataValue;
+}
+
 // Draws webification tiles using min, max, and time as a filter. Main difference
 // between this and other tile draws is that its get value refers back to the json
 // that stored those values.
 function drawWebificationTiles(data_name, canvas, tiles, tilegrid, size, color_scale, min, max, opacity, filter, timeMin, timeMax){
     var context = canvas.getContext('2d');
-    var no_data_value = tiles[0]["no_data_value"];
     for(i = 0; i < tiles.length; i++){
         var tile = tiles[i];
         var tile_coord = tile["coord"];
         var pixel = findDrawTilePixel(tilegrid, tile_coord);
         pixel = [Math.round(pixel[0]), Math.round(pixel[1])];
         var image = context.createImageData(size, size);
-        var original_image = context.getImageData(pixel[0], pixel[1], size, size);
+        var values = getImgData(webification_layer, tile_coord);
+        var no_data_value = getNoDataValue(webification_layer, tile_coord);
         var change = false;
-        for(j = 0; j < tile["values"].length; j++){
-            var index = tile["values"][j];
-            var value = getValue(data_name, tile["values"][j], no_data_value);
+        for(j = 0; j < values.length; j++){
+            var index = values[j];
+            var value = getValue(data_name, values[j], no_data_value);
             if(!filter){
                 if(value != null){
                     if(value < min && index >= timeMin && index <= timeMax){
@@ -1236,19 +1244,19 @@ function drawWebificationTiles(data_name, canvas, tiles, tilegrid, size, color_s
 * Draws a tile at the starting pixel with the given size, opacity, and
 * using the color_scale and min, max specified.
 */
-function drawTiles(canvas, tiles, tilegrid, size, color_scale, min, max, opacity, filter){
+function drawTiles(layer, canvas, tiles, tilegrid, size, color_scale, min, max, opacity, filter){
     var context = canvas.getContext('2d');
-    var no_data_value = tiles[0]["no_data_value"];
     for(i = 0; i < tiles.length; i++){
         var tile = tiles[i];
         var tile_coord = tile["coord"];
         var pixel = findDrawTilePixel(tilegrid, tile_coord);
         pixel = [Math.round(pixel[0]), Math.round(pixel[1])];
         var image = context.createImageData(size, size);
-        var original_image = context.getImageData(pixel[0], pixel[1], size, size);
+        var values = getImgData(layer, tile_coord);
+        var no_data_value = getNoDataValue(layer, tile_coord);
         if(!filter){
-            for(j = 0; j < tile["values"].length; j++){
-                var value = tile["values"][j];
+            for(j = 0; j < values.length; j++){
+                var value = values[j];
                 if(value != no_data_value){
                     if(value < min){
                         value = min;
@@ -1272,8 +1280,8 @@ function drawTiles(canvas, tiles, tilegrid, size, color_scale, min, max, opacity
             }
         }
         else{
-            for(j = 0; j < tile["values"].length; j++){
-                var value = tile["values"][j];
+            for(j = 0; j < values.length; j++){
+                var value = values[j];
                 if(value != no_data_value && value > min && value < max){
                     var colors = color(color_scale, value, min, max);
                     image.data[j * 4] = colors[0];
@@ -1358,7 +1366,7 @@ air_layer.on('postcompose', function(evt){
             var range = slider_air.getValue();
             var filter = document.getElementById("filter-values-air").checked;
             var opacity = 255 * slider_transparency_air.getValue()/100;
-            drawTiles(canvas, visible_tiles, tilegrid, size, color_scale, range[0], range[1], opacity, filter);
+            drawTiles(air_layer, canvas, visible_tiles, tilegrid, size, color_scale, range[0], range[1], opacity, filter);
         }
     }
 })
@@ -1375,14 +1383,16 @@ CO_layer.on('postcompose', function(evt){
         tilegrid.forEachTileCoord(current_extent, zoom, function(tile_coord){
             findTilesInExtent(tile_coord, "CO_total_column", visible_tiles);
         })
+        console.log("hi??")
         if(visible_tiles.length != 0){
+          console.log("why???")
             var canvas = evt.context.canvas;
             var ctx = canvas.getContext('2d');
             var color_scale = document.getElementById("color-options-air")[document.getElementById("color-options-air").selectedIndex].innerHTML;
             var range = slider_carbon.getValue();
             var filter = document.getElementById("filter-values-air").checked;
             var opacity = 255 * slider_transparency_air.getValue()/100;
-            drawTiles(canvas, visible_tiles, tilegrid, size, color_scale, range[0], range[1], opacity, filter);
+            drawTiles(CO_layer, canvas, visible_tiles, tilegrid, size, color_scale, range[0], range[1], opacity, filter);
         }
     }
 })
@@ -1406,7 +1416,7 @@ H2O_layer.on('postcompose', function(evt){
             var range = slider_vapor.getValue();
             var filter = document.getElementById("filter-values-air").checked;
             var opacity = 255 * slider_transparency_air.getValue()/100;
-            drawTiles(canvas, visible_tiles, tilegrid, size, color_scale, range[0], range[1], opacity, filter);
+            drawTiles(H2O_layer, canvas, visible_tiles, tilegrid, size, color_scale, range[0], range[1], opacity, filter);
         }
     }
 })
@@ -1430,7 +1440,7 @@ cloud_layer.on('postcompose', function(evt){
             var range = slider_cloud.getValue();
             var filter = document.getElementById("filter-values-air").checked;
             var opacity = 255 * slider_transparency_air.getValue()/100;
-            drawTiles(canvas, visible_tiles, tilegrid, size, color_scale, range[0], range[1], opacity, filter);
+            drawTiles(cloud_layer, canvas, visible_tiles, tilegrid, size, color_scale, range[0], range[1], opacity, filter);
         }
     }
 })
@@ -1580,10 +1590,10 @@ function findValue(layer, layer_name, webified){
         return "N/A";
     }
     if(webified){
-        var value = getValue(layer_name, tile["values"][i], tile["no_data_value"]);
+        var value = getValue(layer_name, getImgData(layer, tile["coord"])[i], getNoDataValue(layer, tile["coord"]));
     }
     else{
-        var value = tile["values"][i];
+        var value = getImgData(layer, tile["coord"])[i];
         if(value == tile["no_data_value"]){
             value = null;
         }
@@ -1621,6 +1631,7 @@ var csv_data = [];
 /* Finds the aggregate statistics within the box */
 function calculateBox(tilegrid, tile_size, tile_array, box_extent){
     var layer_name;
+    var layer;
     // Start by figuring out which layer was selected
     switch(document.getElementById("layer-picker").selectedIndex){
         case 0:
@@ -1658,10 +1669,11 @@ function calculateBox(tilegrid, tile_size, tile_array, box_extent){
         var starting_y = Math.round(intersection_top_corner[1] - tile_top_corner[1]);
 
         /* The pixel within the current box to start iterating from */
+        var tile = getImgData(webification_layer, tile_array[i]["coord"]);
         var current_tile_pixel = starting_y * tile_size + starting_x;
         for(j = 0; j < height; j++){
             for(k = 0; k < width; k++){
-                var value = getValue(layer_name, tile_array[i]["values"][current_tile_pixel], tile_array[i]["no_data_value"]);
+                var value = getValue(layer_name, tile[current_tile_pixel], tile_array[i]["no_data_value"]);
                 if(value != null){
                     var x = tile_top_corner[0] + current_tile_pixel % tile_size;
                     var y = tile_top_corner[1] + current_tile_pixel/Math.round(tile_size);
@@ -1671,7 +1683,6 @@ function calculateBox(tilegrid, tile_size, tile_array, box_extent){
                     }
                     else{
                         chart_data.push(Math.round(value * 100));
-                        console.log(value)
                     }
                     csv_data.push([value, map.getCoordinateFromPixel(pixel)[0], map.getCoordinateFromPixel(pixel)[1]]);
                     total += value;
@@ -1857,22 +1868,23 @@ function createCSV(){
 
 // Downloads the full data set
 function download(){
-    var a = document.createElement('a');
+    var b = document.createElement('b');
     switch(document.getElementById("layer-download").selectedIndex){
         case 0:
-            a.download = "data/TSurfAir.json";
+            b.download = "data/TSurfAir.json";
             break;
         case 1:
-            a.download = "data/CO_total_column.json";
+            b.download = "data/CO_total_column.json";
             break;
         case 2:
-            a.download = "data/totH2OStd.json";
+            b.download = "data/totH2OStd.json";
             break;
         case 3:
-            a.download = "data/CldFrcTot.json";
+            b.download = "data/CldFrcTot.json";
             break;
     }
-    a.click();
+    document.body.appendChild(b)
+    window.open(b.download);
 }
 
 // This code finds the mouse and then displays values of points on click
