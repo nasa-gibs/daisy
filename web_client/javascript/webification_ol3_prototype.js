@@ -1863,7 +1863,7 @@ function download(){
             break;
     }
     document.body.appendChild(b)
-    window.open(b);
+    window.open(b.download);
 }
 
 // This code finds the mouse and then displays values of points on click
