@@ -1568,33 +1568,12 @@ function findValue(layer, layer_name, webified){
     var column = pixel[1] - Math.round(tilePixel[1]);
     var zoom = tilegrid.getZForResolution(map.getView().getResolution());
     var i = Math.round(column * tilegrid.getTileSize(zoom) + row);
-    var tile;
-    var x = tileCoord[1];
-    var y = tileCoord[2];
-    var z = tileCoord[0];
     if(webified){
-        tile_array = layer_array["webification"];
+        var value = getValue(layer_name, getImgData(webification_layer, tileCoord)[i], getNoDataValue(webification_layer, tileCoord));
     }
     else{
-        var tile_array = layer_array[layer_name];
-    }
-    for(j = 0; j < tile_array.length; j++){
-        var coord = tile_array[j]["coord"];
-        if(coord[0] == z && coord[1] == x && coord[2] == y){
-            tile = tile_array[j];
-            break;
-        }
-    }
-
-    if(tile == null){
-        return "N/A";
-    }
-    if(webified){
-        var value = getValue(layer_name, getImgData(layer, tile["coord"])[i], getNoDataValue(layer, tile["coord"]));
-    }
-    else{
-        var value = getImgData(layer, tile["coord"])[i];
-        if(value == tile["no_data_value"]){
+        var value = getImgData(layer, tileCoord)[i];
+        if(value == getNoDataValue(layer, tileCoord)){
             value = null;
         }
     }
@@ -1884,7 +1863,7 @@ function download(){
             break;
     }
     document.body.appendChild(b)
-    window.open(b.download);
+    window.open(b);
 }
 
 // This code finds the mouse and then displays values of points on click
@@ -1908,7 +1887,8 @@ container.addEventListener('mouseout', function() {
 });
 
 
-map.on('click', function(evt){
+map.on('pointermove', function(evt){
+  console.log('wut')
     var coord = map.getCoordinateFromPixel([mousePosition[0], mousePosition[1]]);
     var html = "<b>Latitude:</b> " + coord[1].toFixed(2) + "<br><b>Longitude:</b> " + coord[0].toFixed(2) + "<br>&nbsp;&nbsp;&nbsp;&nbsp;<table class='table-bordered'><th>Webified Layer</th><th>Value</th><tr><td>Air Temperature</td><td>";
     html = html + findValue(webification_layer, "TSurfAir", true) + "K" + "</td></tr>";
