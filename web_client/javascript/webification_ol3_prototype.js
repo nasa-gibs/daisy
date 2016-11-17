@@ -1160,6 +1160,13 @@ function getImgData(mapLayer, tileCoord){
   return imgData.decodedPixels.pixelData;
 }
 
+function getImgDataClick(mapLayer, tileCoord){
+  var imgData = mapLayer.getSource().a.get(tileCoord.join('/')).g;
+  console.log(tileCoord)
+  console.log(imgData.decodedPixels);
+  return imgData.decodedPixels.pixelData;
+}
+
 function getNoDataValue(mapLayer, tileCoord){
   var noDataValue = mapLayer.getSource().a.get(tileCoord.join('/')).g;
   return noDataValue.decodedPixels.noDataValue;
@@ -1373,7 +1380,7 @@ air_layer.on('postcompose', function(evt){
 
 CO_layer.on('postcompose', function(evt){
     changeSliderCarbonColor();
-    if(layer_array["CO_total_column"] != null && document.getElementById("web-checkbox").checked && getRadioVal == "CO_total_column"){
+    if(layer_array["CO_total_column"] != null && document.getElementById("web-checkbox").checked && getRadioVal() == "CO_total_column"){
         var view = map.getView();
         var current_extent = view.calculateExtent(map.getSize());
         var tilegrid = CO_layer.getSource().getTileGrid();
@@ -1383,9 +1390,7 @@ CO_layer.on('postcompose', function(evt){
         tilegrid.forEachTileCoord(current_extent, zoom, function(tile_coord){
             findTilesInExtent(tile_coord, "CO_total_column", visible_tiles);
         })
-        console.log("hi??")
         if(visible_tiles.length != 0){
-          console.log("why???")
             var canvas = evt.context.canvas;
             var ctx = canvas.getContext('2d');
             var color_scale = document.getElementById("color-options-air")[document.getElementById("color-options-air").selectedIndex].innerHTML;
@@ -1569,7 +1574,7 @@ function findValue(layer, layer_name, webified){
     var zoom = tilegrid.getZForResolution(map.getView().getResolution());
     var i = Math.round(column * tilegrid.getTileSize(zoom) + row);
     if(webified){
-        var value = getValue(layer_name, getImgData(webification_layer, tileCoord)[i], getNoDataValue(webification_layer, tileCoord));
+        var value = getValue(layer_name, getImgDataClick(webification_layer, tileCoord)[i], getNoDataValue(webification_layer, tileCoord));
     }
     else{
         var value = getImgData(layer, tileCoord)[i];
@@ -1887,9 +1892,9 @@ container.addEventListener('mouseout', function() {
 });
 
 
-map.on('pointermove', function(evt){
-  console.log('wut')
+map.on('click', function(evt){
     var coord = map.getCoordinateFromPixel([mousePosition[0], mousePosition[1]]);
+    console.log(coord)
     var html = "<b>Latitude:</b> " + coord[1].toFixed(2) + "<br><b>Longitude:</b> " + coord[0].toFixed(2) + "<br>&nbsp;&nbsp;&nbsp;&nbsp;<table class='table-bordered'><th>Webified Layer</th><th>Value</th><tr><td>Air Temperature</td><td>";
     html = html + findValue(webification_layer, "TSurfAir", true) + "K" + "</td></tr>";
     html = html + "<tr><td>Cloud Fraction Total</td><td>" +  findValue(webification_layer, "CldFrcTot", true) + "</td></tr>";
