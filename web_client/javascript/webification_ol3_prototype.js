@@ -11,7 +11,7 @@
 var layer_array = new Array();
 var translated_values = [];
 //Change to localhost once applicable
-var server_name = "skywalker.jpl.nasa.gov";
+var server_name = "localhost";
 /*
 * Given the name of the layer (will be the key) and the array of values of a
 * tile, it will store it in the layer_array. How to access an element of layer_array:

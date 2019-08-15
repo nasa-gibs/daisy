@@ -10,7 +10,7 @@ var values = [];
 // var time = [];
 
 //By default should be localhost
-var server_name = "skywalker.jpl.nasa.gov";
+var server_name = "localhost";
 window.onload = function(){
   //Base blue marble map
   var base_layer = new Cesium.WebMapTileServiceImageryProvider({
@@ -167,9 +167,6 @@ window.onload = function(){
   // Create the Cesium widget that holds the globe and other things.
   viewer = new Cesium.Viewer('cesium-container', {
     imageryProvider : base_layer,
-    terrainProvider : new Cesium.CesiumTerrainProvider({
-      url : '//assets.agi.com/stk-terrain/world'
-    }),
     baseLayerPicker : false
   });
 
