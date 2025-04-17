@@ -103,13 +103,13 @@ var map = new ol.Map({
 
 /* This is the base map, which is displayed under the data layer */
 var base_source = new ol.source.WMTS({
-    url: "//gibs.earthdata.nasa.gov/wmts-geo/wmts.cgi?TIME=2013-06-16",
-    layer: "BlueMarble_ShadedRelief_Bathymetry",
+    url: "https://gibs-a.earthdata.nasa.gov/wmts/epsg4326/best/wmts.cgi?TIME=2023-10-22T00:00:00Z",
+    layer: "BlueMarble_ShadedRelief",
     format: "image/jpeg",
     style: "default",
     crossOrigin: "Anonymous",
     minZoom: 1,
-    matrixSet: "EPSG4326_500m",
+    matrixSet: "500m",
     wrapX: true,
     extent: [-36000, -90, 360000, 90],
     tileGrid: new ol.tilegrid.WMTS({
